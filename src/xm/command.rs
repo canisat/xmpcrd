@@ -8,21 +8,25 @@ use crate::xm::radio_id::XMRadioID;
 pub struct XMCommand;
 
 impl XMCommand {
-    #[allow(dead_code)]
+    #[allow(dead_code)] // Remember to take these out after being implemented
     pub fn power_on() -> XMPacket {
         XMPacket::new(vec![0x00, 0x10, 0x10, 0x10, 0x01])
     }
-    #[allow(dead_code)]
+    #[allow(dead_code)] // Remember to take these out after being implemented
     pub fn power_off() -> XMPacket {
         XMPacket::new(vec![0x01, 0x00])
     }
-    #[allow(dead_code)]
+    #[allow(dead_code)] // Remember to take these out after being implemented
     pub fn select_channel(channel: u8) -> XMPacket {
         XMPacket::new(vec![0x10, 0x02, channel, 0x00, 0x00, 0x01])
     }
-    #[allow(dead_code)]
+    #[allow(dead_code)] // Remember to take these out after being implemented
     pub fn get_radio_id() -> XMPacket {
         XMPacket::new(vec![0x31])
+    }
+    #[allow(dead_code)] // Remember to take these out after being implemented
+    pub fn get_channel_info(channel: u8) -> XMPacket {
+        XMPacket::new(vec![0x25, 0x08, channel, 0x00])
     }
 }
 

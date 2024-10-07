@@ -2,11 +2,10 @@ mod xm;
 mod hw;
 
 use text_io::scan;
-use xm::packet::XMPacket;
 use xm::command::{XMCommand, send_command};
 use hw::serial::xm_pcr_serial;
 use std::time::Duration;
-use std::io::{self, Write};
+use std::io;
 
 fn main() -> Result<(), io::Error> {
     let port_name: &str = "/dev/ttyUSB0"; // Adjust as per your system
@@ -25,7 +24,8 @@ fn main() -> Result<(), io::Error> {
     println!("1. Power Radio On");
     println!("2. Power Radio Off");
     println!("3. Select Channel");
-    println!("4. Get Radio ID");
+    println!("4. Get Channel Info");
+    println!("5. Get Radio ID");
     println!("0. Exit");
 
     let a: i32;
@@ -67,6 +67,23 @@ fn main() -> Result<(), io::Error> {
             }
         },
         4 => {
+            println!("Enter the channel number (0-255): ");
+            let channel: u8;
+            scan!("{}", channel);
+
+            match send_command(&mut *port, XMCommand::get_channel_info(channel), timeout, true) {
+            Ok(Some(response)) => {
+                println!("Received valid XM packet: {}", response);
+            },
+            Ok(None) => {
+                println!("No response expected.");
+            },
+            Err(e) => {
+                eprintln!("Error: {}", e);
+            }
+            }
+        }
+        5 => {
             match send_command(&mut *port, XMCommand::get_radio_id(), timeout, true) {
                 Ok(Some(serial_number_str)) => {
                     println!("Received valid XMRadioID: {}", serial_number_str);
