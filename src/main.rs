@@ -88,10 +88,5 @@ fn main() -> Result<(), io::Error> {
         }
     }
 
-    // Example of sending a command that expects a response
-    
-
-    // Example of sending a command that does not expect a response
-
     Ok(())
 }
