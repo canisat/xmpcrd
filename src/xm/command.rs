@@ -1,10 +1,9 @@
-use serialport::SerialPort;
-use std::thread::sleep;
-use std::time::Duration;
 use std::io;
-
-use super::packet::XMPacket;
-use super::radio_id::XMRadioID;
+use std::time::Duration;
+use std::thread::sleep;
+use serialport::SerialPort;
+use crate::xm::packet::XMPacket;
+use crate::xm::radio_id::XMRadioID;
 
 pub struct XMCommand;
 
@@ -27,12 +26,16 @@ impl XMCommand {
     }
 }
 
-pub fn send_command(port: &mut dyn SerialPort, command: XMPacket, timeout: Duration) -> Result<String, io::Error> {
-    loop {
-        // Send the command
-        port.write_all(&command.to_bytes())?;
-        port.flush()?;
+pub fn send_command(port: &mut dyn SerialPort, command: XMPacket, timeout: Duration, expect_response: bool) -> Result<Option<String>, io::Error> {
+    // Send the command
+    port.write_all(&command.to_bytes())?;
+    port.flush()?;
 
+    if (!expect_response) {
+        return Ok(None); // Return immediately if no response is expected
+    }
+
+    loop {
         // Read the response from the serial port
         let mut response: Vec<u8> = vec![0; 1024]; // Buffer for response
         match port.read(&mut response) {
@@ -48,7 +51,7 @@ pub fn send_command(port: &mut dyn SerialPort, command: XMPacket, timeout: Durat
                         Ok(radio_id) => {
                             let serial_number_bytes = radio_id.get_radio_id();
                             let serial_number_str = String::from_utf8_lossy(serial_number_bytes).to_string();
-                            return Ok(serial_number_str); // Return the serial number string
+                            return Ok(Some(serial_number_str)); // Return the serial number string
                         },
                         Err(e) => {
                             eprintln!("Error parsing XMRadioID: {}", e);
